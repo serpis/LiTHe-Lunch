@@ -1,0 +1,28 @@
+This project contains frontend and backend code for LiTHe Lunch. LiTHe Lunch scrapes the lunch menus of the restaurants located on the Linköping University campus and displays them in a way optimized for hungry and impatient students.
+LiTHe Lunch is both an Android application and a website.
+
+
+
+frontend:
+Android application that reads and displays lunch menus in the json format output by the backend.
+
+
+backend/menuparser.py:
+Python 3 script to scrape the menus of restaurants Blåmesen, Kårallen and Zenit and output their menus in a unified format. Resulting menus are written to stdout.
+Run 'python3 menuparser.py' to scrape menus and output a json file compatible with the Android frontend.
+Run 'python3 menuparser.py html' to scrape menus and output html.
+
+
+backend/viewer.js:
+Place this in the same directory as the html output from menuparser to enable client-side hiding of old menus.
+
+
+To keep the menus updated automatically I wrote a script called update_menu.sh:
+#/bin/sh
+TMPFILE=`mktemp`
+chmod +r $TMPFILE
+python3 /home/serp/menuparser/menuparser.py > $TMPFILE && mv $TMPFILE /home/serp/public_html/lunch/menu0001.txt
+python3 /home/serp/menuparser/menuparser.py html > $TMPFILE && mv $TMPFILE /home/serp/public_html/lunch/menu.html
+and ask crontab to run it once an hour:
+@hourly /home/serp/update_menu.sh
+

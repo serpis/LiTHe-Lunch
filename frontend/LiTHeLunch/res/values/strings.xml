@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LiTHe Lunch</string>
+    <string name="refresh">Uppdatera</string>
+    <string name="updateFrequency">Uppdateringsfrekvens...</string>
+    <string name="updateManually">Endast manuellt</string>
+    <string name="updateDaily">Dagligen</string>
+    <string name="updateEveryStart">Varje programstart</string>
+</resources>
