@@ -110,9 +110,11 @@ def zenit_menu():
 
 			self.title = ""
 			self.summary = ""
+			self.publisheddate = ""
 
 			self.titles = []
 			self.summaries = []
+			self.publisheddates = []
 
 		def startElement(self, name, attrs):
 			self.elementStack.append(name)
@@ -123,6 +125,9 @@ def zenit_menu():
 			if name == "title" and "entry" in self.elementStack:
 				self.titles.append(self.title)
 				self.title = ""
+			elif name == "published" and "entry" in self.elementStack:
+				self.publisheddates.append(self.publisheddate)
+				self.publisheddate = ""
 			elif name == "summary":
 				self.summaries.append(self.summary)
 				self.summary = ""
@@ -130,6 +135,8 @@ def zenit_menu():
 		def characters(self, content):
 			if self.elementStack[-1] == "title" and "entry" in self.elementStack:
 				self.title += content
+			elif self.elementStack[-1] == "published" and "entry" in self.elementStack:
+				self.publisheddate += content
 			elif self.elementStack[-1] == "summary":
 				self.summary += content
 
@@ -176,6 +183,7 @@ def zenit_menu():
 	year = date.today().year
 
 	for i in range(len(p.titles)):
+		year = int(re.search(r"^(\d{4})-", p.publisheddates[i]).group(1))
 		week = int(re.search(r"Vecka (\d+)", p.titles[i]).group(1))
 		
 		for chunk in re.findall(r"<.+?>|[^<]+", p.summaries[i]):
