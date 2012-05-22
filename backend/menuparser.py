@@ -179,12 +179,9 @@ def zenit_menu():
 
 	dmp = DayMenuParser()
 
-	# year is implicitly the same as current year
-	year = date.today().year
-
 	for i in range(len(p.titles)):
-		year = int(re.search(r"^(\d{4})-", p.publisheddates[i]).group(1))
-		week = int(re.search(r"Vecka (\d+)", p.titles[i]).group(1))
+		year, month, day = [int(x) for x in re.search(r"^(\d{4})\-(\d{2})\-(\d{2})", p.publisheddates[i]).group(1, 2, 3)]
+		week = int(date(year, month, day).strftime("%V"))
 		
 		for chunk in re.findall(r"<.+?>|[^<]+", p.summaries[i]):
 			if chunk[0] == "<":
