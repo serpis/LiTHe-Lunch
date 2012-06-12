@@ -78,7 +78,8 @@ def karallen_menu():
 	# first, we need some detective work to find lunch menu url
 	start_data = slurp("http://www.cgnordic.com/sv/Eurest-Sverige/Restauranger/Restaurang-Karallen-Linkopings-universitet/")
 	base_url = "http://www.cgnordic.com"
-	extra_url = re.search(r"\"([^\"]+)\">\s+Lunchmeny", start_data).group(1)
+	#extra_url = re.search(r"\"([^\"]+)\">\s+Lunchmeny", start_data).group(1)
+	extra_url = re.search(r"\"([^\"]+)\">Dagens lunch", start_data).group(1)
 	menu_url = base_url + extra_url
 
 	data = slurp(menu_url)
@@ -141,7 +142,7 @@ def zenit_menu():
 				self.summary += content
 
 	p = ZenitFeedParser()
-	xml.sax.parse("http://www.hors.se/dagens-lunch/feed?restaurant=restaurang-zenit", p)
+	xml.sax.parse("http://www.hors.se/dagens-lunch/feed?restaurant=zenit", p)
 
 	# every day follows the same pattern: <h2>weekday</h2><ul><li>dish1</li><li>dish2</li></ul>
 	class DayMenuParser(xml.sax.handler.ContentHandler):
@@ -317,7 +318,8 @@ def render_html(menus):
 output_html = len(sys.argv) == 2 and sys.argv[1] == "html"
 
 
-restaurants = [("Blåmesen", blamesen_menu), ("Kårallen", karallen_menu), ("Zenit", zenit_menu)]
+#restaurants = [("Blåmesen", blamesen_menu), ("Kårallen", karallen_menu), ("Zenit", zenit_menu)]
+restaurants = [("Blåmesen", blamesen_menu), ("Zenit", zenit_menu)]
 menus = []
 for (name, menu_getter) in restaurants:
 	menus.append({ "name": name, "menu": [x for x in menu_getter() if (date.today() - x["date"]).days < 7] })
