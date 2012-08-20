@@ -22,6 +22,11 @@ class ParseError:
 	def __init__(self, msg):
 		self.msg = msg
 
+def resolve_month_number(month):
+	months = ["Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+	# + because January should be 1, Febraury 2 etc
+	return months.index(month[0:3]) + 1
+
 def resolve_weekday_offset(weekday):
 	# Monday = 1. the reason is that python likes
 	# weeks starting on Sunday, with Sunday = 0
@@ -59,7 +64,7 @@ def json_date(d):
 
 def blamesen_menu():
 	data = slurp("http://www.blamesen.se/default.asp?HeadPage=464&Lunchmeny")
-	(data, week) = re.search(r"(<span class=\"header_XL\">Lunchmeny&nbsp;&nbsp;-&nbsp;&nbsp;Vecka (\d+).*?<div class=\"clear\">)", data).groups()
+	(data, week) = re.search(r"(<span class=\"header_XL\">Lunchmeny&nbsp;&nbsp;-&nbsp;&nbsp;Vecka(?:&nbsp;| )(\d+).*?<div class=\"clear\">)", data).groups()
 
 	# year is implicitly the same as current year
 	year = date.today().year
@@ -76,31 +81,43 @@ def blamesen_menu():
 
 def karallen_menu():
 	# first, we need some detective work to find lunch menu url
-	start_data = slurp("http://www.cgnordic.com/sv/Eurest-Sverige/Restauranger/Restaurang-Karallen-Linkopings-universitet/")
-	base_url = "http://www.cgnordic.com"
+	#start_data = slurp("http://www.cgnordic.com/sv/Eurest-Sverige/Restauranger/Restaurang-Karallen-Linkopings-universitet/")
+	start_data = slurp("http://www.compass-group.se/restauranger/Restaurang-Karallen/Dagens-lunch")
+	#base_url = "http://www.cgnordic.com"
 	#extra_url = re.search(r"\"([^\"]+)\">\s+Lunchmeny", start_data).group(1)
-	extra_url = re.search(r"\"([^\"]+)\">Dagens lunch", start_data).group(1)
-	menu_url = base_url + extra_url
+	#extra_url = re.search(r"\"([^\"]+)\">Dagens lunch", start_data).group(1)
+	#menu_url = base_url + extra_url
+	
+	menu_url = re.search(r"<iframe.+?src='([^']+)'", start_data).group(1)
+	#print(menu_url)
 
 	data = slurp(menu_url)
-	week = int(re.search("Lunchmeny v.(\S+)", data).group(1))
-
-	# cut out roughly the relevant part
-	data = re.search(r"lkommen&(.+i?)Pris dagens", data).group(1)
+	week = int(re.search(r"WeekDate\">V (\d+)</span>", data).group(1))
 
 	# year is implicitly the same as current year
 	year = date.today().year
+
+	dishes = []
+	current_date = None
 	menu = []
-	for weekday, content in re.findall(r"<strong>(....?dag)(.*?)(?=<strong|$)", data):
+
+	for item in re.findall(r"Day(Date)\">(\d+) (.+?)</span>|(Meal)Name\">(.+?)</span>", data):
+		if item[0] == "Date":
+			if len(dishes):
+				menu.append({ "date": current_date, "dishes": dishes })
+				dishes = []
+
+			day = int(item[1])
+			month = resolve_month_number(item[2])
+
+			current_date = date(year, month, day)
+		else:
+			dish_name = item[4]
+			dishes.append({ "name": dish_name, "price": "dummy" })
+
+	if len(dishes):
+		menu.append({ "date": current_date, "dishes": dishes })
 		dishes = []
-		for dish_name in re.findall(r">([^>]+?)(?:</p>)?</td></tr>", content):
-			dish_name = sanitize(dish_name)
-            # remove any mention about Cellskapet!
-			dish_name = re.sub("\([^)]*Cellskapet[^)]*\)", "", dish_name)
-			if len(dish_name) > 0:
-				dishes.append({ "name": dish_name, "price": "dummy"})
-		weekday_offset = resolve_weekday_offset(weekday)
-		menu.append({ "date": resolve_date(year, int(week), weekday_offset), "dishes": dishes })
 
 	return menu
 	
@@ -200,7 +217,7 @@ def zenit_menu():
 
 # stolen from http://www.peterbe.com/plog/uniqifiers-benchmark
 def uniqify(seq, idfun=None): 
-    # order preserving
+	# order preserving
 	if idfun is None:
 		def idfun(x): return x
 	seen = {}
@@ -318,8 +335,9 @@ def render_html(menus):
 output_html = len(sys.argv) == 2 and sys.argv[1] == "html"
 
 
-#restaurants = [("Blåmesen", blamesen_menu), ("Kårallen", karallen_menu), ("Zenit", zenit_menu)]
-restaurants = [("Blåmesen", blamesen_menu), ("Zenit", zenit_menu)]
+restaurants = [("Blåmesen", blamesen_menu), ("Kårallen", karallen_menu), ("Zenit", zenit_menu)]
+#restaurants = [("Blåmesen", blamesen_menu), ("Zenit", zenit_menu)]
+#restaurants = [("Zenit", zenit_menu)]
 menus = []
 for (name, menu_getter) in restaurants:
 	menus.append({ "name": name, "menu": [x for x in menu_getter() if (date.today() - x["date"]).days < 7] })
