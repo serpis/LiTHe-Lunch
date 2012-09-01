@@ -18,7 +18,7 @@ public class DayMenuView extends LinearLayout {
 		switch (date.get(Calendar.DAY_OF_WEEK))
 		{
 			case Calendar.MONDAY:
-				return "MÃ¥ndag";
+				return "MŒndag";
 			case Calendar.TUESDAY:
 				return "Tisdag";
 			case Calendar.WEDNESDAY:
@@ -28,10 +28,10 @@ public class DayMenuView extends LinearLayout {
 			case Calendar.FRIDAY:
 				return "Fredag";
 			case Calendar.SATURDAY:
-				return "LÃ¶rdag";
+				return "Lšrdag";
 			case Calendar.SUNDAY:
 			default:
-				return "SÃ¶ndag";
+				return "Sšndag";
 		}
 	}
 	
@@ -82,7 +82,7 @@ public class DayMenuView extends LinearLayout {
 		dateLabel.setText(dateToString(dayMenu.date));
 		this.addView(dateLabel);
 		
-		TabHost tabHost = new TabHost(context);
+		TabHost tabHost = new TabHost(context, null);
 		tabHost.setId(android.R.id.tabhost);
 	
 		// setup tab host

@@ -63,7 +63,7 @@ public class MenusActivity extends Activity {
 		if (updatingMenus)
 		{
 			Toast.makeText(getApplicationContext(),
-					"Nu lugnar du ner dig! Jag h√•ller ju redan p√• och uppdaterar menyn!",
+					"Nu lugnar du ner dig! Jag håller ju redan på och uppdaterar menyn!",
 					Toast.LENGTH_SHORT).show();
 		}
 		else
@@ -82,7 +82,7 @@ public class MenusActivity extends Activity {
 					{
 						if (parseAndDisplayMenus(result.content)) {
 							Toast.makeText(getApplicationContext(),
-									"S√• d√§r ja!",
+									"Så där ja!",
 									Toast.LENGTH_SHORT).show();
 							menuCache.saveMenu(result.content);
 						}
@@ -90,7 +90,7 @@ public class MenusActivity extends Activity {
 				}
 			}.execute(Versioning.MENU_URL);
 			Toast.makeText(getApplicationContext(),
-					"H√§mtar menyer...",
+					"Hämtar menyer...",
 					Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -100,7 +100,7 @@ public class MenusActivity extends Activity {
 		// special case: catch users trying to use the app without logging in using netlogon  
 		if (content.indexOf("Netlogon") != -1) {
 			Toast.makeText(getApplicationContext(),
-					"Det verkar som att du gl√∂mt logga in p√• netlogon. G√∂r det och f√∂rs√∂k uppdatera menyerna igen!",
+					"Det verkar som att du glömt logga in på netlogon. Gör det och försök uppdatera menyerna igen!",
 					Toast.LENGTH_LONG).show();
 			return false;
 		}
@@ -119,7 +119,7 @@ public class MenusActivity extends Activity {
 			else
 			{
 				Toast.makeText(getApplicationContext(),
-						"Allvarligt fel vid parsning av menyerna. V√§lj Uppdatera i menyn f√∂r att h√§mta nya menyer!",
+						"Allvarligt fel vid parsning av menyerna. Välj Uppdatera i menyn för att hämta nya menyer!",
 						Toast.LENGTH_LONG).show();
 				return false;
 			}
@@ -127,7 +127,7 @@ public class MenusActivity extends Activity {
 		catch (JSONException e)
 		{
 			Toast.makeText(getApplicationContext(),
-					"Fel vid parsning av menyerna. V√§lj Uppdatera i menyn f√∂r att h√§mta nya menyer!",
+					"Fel vid parsning av menyerna. Välj Uppdatera i menyn för att hämta nya menyer!",
 					Toast.LENGTH_LONG).show();
 			return false;
 		}

@@ -113,7 +113,7 @@ class ContentGetter extends AsyncTask<String, Void, GetContentResult> {
 		}
 		catch(ReadContentException e)
 		{
-			return new GetContentResult(false, "Fel vid h√§mtning: " + e.toString());
+			return new GetContentResult(false, "Fel vid hämtning: " + e.toString());
 		}
 	}
 }
